@@ -1,11 +1,7 @@
-let pos = 0;
 const pacArray = [
   ['./images/PacMan1.png', './images/PacMan2.png'],
   ['./images/PacMan3.png', './images/PacMan4.png'],
 ];
-
-let direction = 0;
-const pacMen = []; // This array holds all the pacmen
 
 // This function returns an object with random values
 function setToRandom(scale) {
@@ -15,52 +11,54 @@ function setToRandom(scale) {
   };
 }
 
+class pacMan {
+    x = 0;
+    mouthPos = 0;
+    img = document.createElement('img');
+    position = 0;
+    velocity = 0;
+
+    constructor() {
+        console.log('new pac');
+        this.position = setToRandom(200);
+        this.velocity = setToRandom(10);
+
+        this.img.style.position = 'absolute';
+        this.img.src = pacArray[0][0];
+        this.img.width = 50;
+        this.img.style.left = this.position.x;
+        this.img.style.top = this.position.y;
+        setInterval(() => this.animate(), 500);
+        setInterval(() => this.move(), 20);
+    }
+    animate() {
+        !this.mouthPos ? this.mouthPos = 1 : this.mouthPos = 0;
+        if (this.velocity.x < 0) this.img.src = pacArray[1][this.mouthPos];
+        else this.img.src = pacArray[0][this.mouthPos];
+    }
+    move() {
+      this.checkCollisions();
+      this.position.x += this.velocity.x;
+      this.position.y += this.velocity.y;
+      this.img.style.left = this.position.x;
+      this.img.style.top = this.position.y;
+    }
+
+    checkCollisions() {
+      if(this.position.x >= window.innerWidth - this.img.width - this.velocity.x  || this.position.x <= 0) {
+        this.velocity.x *= -1;
+        if (this.velocity.x < 0) this.img.src = pacArray[1][this.mouthPos];
+        else this.img.src = pacArray[0][this.mouthPos];
+      }
+      if (this.position.y >= window.innerHeight - this.img.height - this.velocity.y || this.position.y <= 0) {
+        this.velocity.y *= -1;
+      }
+    }
+}
+
 // Factory to make a PacMan at a random position with random velocity
-function makePac() {
-  // returns an object with random values scaled {x: 33, y: 21}
-  let velocity = setToRandom(10); // {x:?, y:?}
-  let position = setToRandom(200);
-
-  // Add image to div id = game
-  let game = document.getElementById('game');
-  let newimg = document.createElement('img');
-  newimg.style.position = 'absolute';
-  newimg.src = './images/PacMan1.png';
-  newimg.width = 50;
-  newimg.style.left = position.x;
-  newimg.style.top = position.y;
-  game.appendChild(newimg);
-
-  // return details in an object
-  return {
-    position,
-    velocity,
-    newimg,
-  };
-}
-
-function update() {
-  // loop over pacmen array and move each one and move image in DOM
-  pacMen.forEach((item) => {
-    checkCollisions(item);
-    item.position.x += item.velocity.x;
-    item.position.y += item.velocity.y;
-
-    item.newimg.style.left = item.position.x;
-    item.newimg.style.top = item.position.y;
-  });
-  setTimeout(update, 20);
-}
-
-function checkCollisions(item) {
-  if(item.position.x >= window.innerWidth - item.newimg.width || item.position.x <= 0) {
-    item.velocity.x *= -1;
-  }
-  if (item.position.y >= window.innerHeight - item.newimg.height || item.position.y <= 0) {
-    item.velocity.y *= -1;
-  }
-}
-
 function makeOne() {
-  pacMen.push(makePac()); 
+    let game = document.getElementById('game');
+    p = new pacMan();
+    game.appendChild(p.img);
 }
